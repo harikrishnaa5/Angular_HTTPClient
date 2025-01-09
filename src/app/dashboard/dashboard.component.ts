@@ -31,12 +31,26 @@ export class DashboardComponent implements OnInit{
     this.FetchAllTasks()
   }
 
+  DeleteTask(id: string | undefined) {
+    this.http.delete("https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/" + id + ".json")
+    .subscribe((res) => {
+      console.log(res)
+      this.FetchAllTasks()
+    })
+  }
+
+  DeleteAllTasks(){
+    this.http.delete("https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json")
+    .subscribe(() => {
+      this.FetchAllTasks()
+    })
+  }
   CreateTask(data: Task){
     const headers = new HttpHeaders({"my-header": "my-header"})
     this.http.post("https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json", data, {headers: headers})
     .subscribe((res) => {
       console.log(res)
-      // this.FetchAllTasks()
+      this.FetchAllTasks()
     })
   }
 
