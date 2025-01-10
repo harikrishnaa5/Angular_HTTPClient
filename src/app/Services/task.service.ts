@@ -35,6 +35,14 @@ export class TaskService {
     return response;
   }
 
+  UpdateTask(id: string | undefined, data: Task) {
+    const response = this.http.put(
+      'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' + id + '.json',
+      data
+    );
+    return response;
+  }
+
   DeleteAllTasks() {
     const response = this.http.delete(
       'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'

@@ -12,13 +12,25 @@ import { TaskService } from '../Services/task.service';
 export class DashboardComponent implements OnInit {
   showCreateTaskForm: boolean = false;
 
+  isEditMode: boolean = false;
   allTasks: Task[] = [];
 
   http: HttpClient = inject(HttpClient);
   task: TaskService = inject(TaskService);
+  selectedTask: Task;
+  selectedTaskId: string
 
   OpenCreateTaskForm() {
     this.showCreateTaskForm = true;
+    this.isEditMode = false;
+    this.selectedTask = {
+      title: '',
+      desc: '',
+      assignedTo: '',
+      createdAt: '',
+      priority: '',
+      status: '',
+    };
   }
 
   CloseCreateTaskForm() {
@@ -27,6 +39,13 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.FetchAllTasks();
+  }
+
+  OnEditClick(id: string | undefined) {
+    this.selectedTaskId = id
+    this.showCreateTaskForm = true;
+    this.isEditMode = true;
+    this.selectedTask = this.allTasks.find((task) => task.id === id);
   }
 
   FetchAllTasksClicked() {
@@ -45,11 +64,17 @@ export class DashboardComponent implements OnInit {
       this.FetchAllTasks();
     });
   }
-  CreateTask(data: Task) {
-    this.task.CreateTask(data).subscribe((res) => {
-      console.log(res);
-      this.FetchAllTasks();
-    });
+  CreateTaskOrUpdateTask(data: Task) {
+    if (this.isEditMode)
+      this.task.UpdateTask(this.selectedTaskId, data).subscribe((res) => {
+        console.log(res);
+        this.FetchAllTasks();
+      });
+    else
+      this.task.CreateTask(data).subscribe((res) => {
+        console.log(res);
+        this.FetchAllTasks();
+      });
   }
 
   private FetchAllTasks() {
