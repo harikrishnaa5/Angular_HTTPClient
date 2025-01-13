@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { Task } from '../Model/Task';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs';
 import { TaskService } from '../Services/task.service';
 
@@ -15,6 +15,7 @@ export class DashboardComponent implements OnInit {
   isEditMode: boolean = false;
   allTasks: Task[] = [];
   isLoading: boolean
+  errorMessage: string | null
 
   http: HttpClient = inject(HttpClient);
   task: TaskService = inject(TaskService);
@@ -80,10 +81,22 @@ export class DashboardComponent implements OnInit {
 
   private FetchAllTasks() {
     this.isLoading = true
-    this.task.GetAllTasks().subscribe((tasks) => {
+    this.task.GetAllTasks().subscribe({next: (tasks) => {
       console.log(tasks);
       this.allTasks = tasks;
       this.isLoading = false
-    });
+    }, error: (error) => {
+      // this.errorMessage = error.message
+      this.setErrorMessage(error)
+      setTimeout(() => {
+        this.errorMessage = null
+      }, 3000);
+      this.isLoading = false
+    }});
+  }
+
+  private setErrorMessage(err: HttpErrorResponse) {
+    if(err.error.error === 'Permission denied')
+    this.errorMessage = 'You have been denied permission to access the data'
   }
 }
