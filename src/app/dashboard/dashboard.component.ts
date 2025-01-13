@@ -14,6 +14,7 @@ export class DashboardComponent implements OnInit {
 
   isEditMode: boolean = false;
   allTasks: Task[] = [];
+  isLoading: boolean
 
   http: HttpClient = inject(HttpClient);
   task: TaskService = inject(TaskService);
@@ -78,9 +79,11 @@ export class DashboardComponent implements OnInit {
   }
 
   private FetchAllTasks() {
+    this.isLoading = true
     this.task.GetAllTasks().subscribe((tasks) => {
       console.log(tasks);
       this.allTasks = tasks;
+      this.isLoading = false
     });
   }
 }
