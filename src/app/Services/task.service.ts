@@ -1,14 +1,16 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Task } from '../Model/Task';
-import { map, Subject } from 'rxjs';
+import { catchError, map, Subject, throwError } from 'rxjs';
+import { LoggingService } from './Logging.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   http: HttpClient = inject(HttpClient);
-  errorSubject = new Subject<HttpErrorResponse>()
+  logService: LoggingService = inject(LoggingService);
+  errorSubject = new Subject<HttpErrorResponse>();
   GetAllTasks() {
     const response = this.http
       .get<{ [key: string]: Task }>(
@@ -23,48 +25,119 @@ export class TaskService {
               tasks.push({ id: key, ...response[key] });
           }
           return tasks;
+        }),
+        catchError((err) => {
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            dateTime: new Date(),
+          };
+          this.logService.logError(errorObj);
+          return throwError(() => err);
         })
       );
     return response;
   }
 
   CreateTask(data: Task) {
-    const response = this.http.post(
-      'https://angularhttpclientsss-b8ed3-default-rtdb.firebaseio.com/tasks.json',
-      data
-    ).subscribe({error: (err) => {
-      this.errorSubject.next(err)
-    }})
+    this.http
+      .post(
+        'https://angularhttpclientsss-b8ed3-default-rtdb.firebaseio.com/tasks.json',
+        data
+      )
+      .pipe(
+        catchError((err) => {
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            dateTime: new Date(),
+          };
+          this.logService.logError(errorObj);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
     // return response;
   }
 
   UpdateTask(id: string | undefined, data: Task) {
-    const response = this.http.put(
-      'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' + id + '.json',
-      data
-    ).subscribe({error: (err) => {
-      this.errorSubject.next(err)
-    }})
+    this.http
+      .put(
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' +
+          id +
+          '.json',
+        data
+      )
+      .pipe(
+        catchError((err) => {
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            dateTime: new Date(),
+          };
+          this.logService.logError(errorObj);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
     // return response;
   }
 
   DeleteAllTasks() {
-    const response = this.http.delete(
-      'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'
-    ).subscribe({error: (err) => {
-      this.errorSubject.next(err)
-    }});
+    this.http
+      .delete(
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'
+      )
+      .pipe(
+        catchError((err) => {
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            dateTime: new Date(),
+          };
+          this.logService.logError(errorObj);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
     // return response;
   }
 
   DeleteTask(id: string | undefined) {
-    const response = this.http.delete(
-      'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' +
-        id +
-        '.json'
-    ).subscribe({error: (err) => {
-      this.errorSubject.next(err)
-    }});
+    this.http
+      .delete(
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' +
+          id +
+          '.json'
+      )
+      .pipe(
+        catchError((err) => {
+          const errorObj = {
+            statusCode: err.status,
+            errorMessage: err.message,
+            dateTime: new Date(),
+          };
+          this.logService.logError(errorObj);
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.errorSubject.next(err);
+        },
+      });
     // return response;
   }
 }
