@@ -1,13 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Task } from '../Model/Task';
-import { map } from 'rxjs';
+import { map, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaskService {
   http: HttpClient = inject(HttpClient);
+  errorSubject = new Subject<HttpErrorResponse>()
   GetAllTasks() {
     const response = this.http
       .get<{ [key: string]: Task }>(
@@ -29,25 +30,31 @@ export class TaskService {
 
   CreateTask(data: Task) {
     const response = this.http.post(
-      'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json',
+      'https://angularhttpclientsss-b8ed3-default-rtdb.firebaseio.com/tasks.json',
       data
-    );
-    return response;
+    ).subscribe({error: (err) => {
+      this.errorSubject.next(err)
+    }})
+    // return response;
   }
 
   UpdateTask(id: string | undefined, data: Task) {
     const response = this.http.put(
       'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' + id + '.json',
       data
-    );
-    return response;
+    ).subscribe({error: (err) => {
+      this.errorSubject.next(err)
+    }})
+    // return response;
   }
 
   DeleteAllTasks() {
     const response = this.http.delete(
       'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'
-    );
-    return response;
+    ).subscribe({error: (err) => {
+      this.errorSubject.next(err)
+    }});
+    // return response;
   }
 
   DeleteTask(id: string | undefined) {
@@ -55,7 +62,9 @@ export class TaskService {
       'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' +
         id +
         '.json'
-    );
-    return response;
+    ).subscribe({error: (err) => {
+      this.errorSubject.next(err)
+    }});
+    // return response;
   }
 }
