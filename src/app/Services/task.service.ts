@@ -1,7 +1,7 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Task } from '../Model/Task';
-import { catchError, map, Subject, throwError } from 'rxjs';
+import { catchError, map, Subject, tap, throwError } from 'rxjs';
 import { LoggingService } from './Logging.service';
 
 @Injectable({
@@ -23,10 +23,11 @@ export class TaskService {
     const response = this.http
       .get<{ [key: string]: Task }>(
         'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json',
-        {headers: header, params: queryParams}
+        {headers: header, params: queryParams, observe: 'body'}
       )
       .pipe(
         map((response) => {
+          console.log(response)
           let tasks = [];
           for (let key in response) {
             if (response.hasOwnProperty(key))
@@ -100,9 +101,17 @@ export class TaskService {
   DeleteAllTasks() {
     this.http
       .delete(
-        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json', {observe: 'events'}
       )
       .pipe(
+        tap((event) => {
+          if(event.type === HttpEventType.Sent) {
+            console.log('sent event occured')
+          }
+          else if(event.type === HttpEventType.Response)
+            console.log('response event occured')
+          console.log(event)
+        }),
         catchError((err) => {
           const errorObj = {
             statusCode: err.status,
