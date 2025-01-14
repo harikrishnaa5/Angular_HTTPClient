@@ -11,12 +11,13 @@ import { TaskService } from '../Services/task.service';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   showCreateTaskForm: boolean = false;
-
+  showTaskDetails: boolean = false
   isEditMode: boolean = false;
   allTasks: Task[] = [];
   isLoading: boolean;
   errorMessage: string | null;
   errorSub: Subscription
+  taskDetails: Task | null = null
 
   http: HttpClient = inject(HttpClient);
   task: TaskService = inject(TaskService);
@@ -38,6 +39,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   CloseCreateTaskForm() {
     this.showCreateTaskForm = false;
+  }
+
+  OnTaskDetailsClick(id: string | undefined) {
+    this.showTaskDetails = true
+    this.task.FetchTaskDetails(id).subscribe({next: (data: Task) => {
+      this.taskDetails = data
+    }})
+  }
+
+  CloseTaskDetails() {
+    this.showTaskDetails = false
   }
 
   ngOnInit(): void {
@@ -80,7 +92,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.task.GetAllTasks().subscribe({
       next: (tasks) => {
-        console.log(tasks);
         this.allTasks = tasks;
         this.isLoading = false;
       },

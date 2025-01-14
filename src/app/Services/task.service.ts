@@ -18,7 +18,6 @@ export class TaskService {
       )
       .pipe(
         map((response) => {
-          console.log(response, 'response');
           let tasks = [];
           for (let key in response) {
             if (response.hasOwnProperty(key))
@@ -42,7 +41,7 @@ export class TaskService {
   CreateTask(data: Task) {
     this.http
       .post(
-        'https://angularhttpclientsss-b8ed3-default-rtdb.firebaseio.com/tasks.json',
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json',
         data
       )
       .pipe(
@@ -61,7 +60,6 @@ export class TaskService {
           this.errorSubject.next(err);
         },
       });
-    // return response;
   }
 
   UpdateTask(id: string | undefined, data: Task) {
@@ -88,7 +86,6 @@ export class TaskService {
           this.errorSubject.next(err);
         },
       });
-    // return response;
   }
 
   DeleteAllTasks() {
@@ -112,7 +109,6 @@ export class TaskService {
           this.errorSubject.next(err);
         },
       });
-    // return response;
   }
 
   DeleteTask(id: string | undefined) {
@@ -138,6 +134,13 @@ export class TaskService {
           this.errorSubject.next(err);
         },
       });
-    // return response;
+  }
+
+  FetchTaskDetails(id: string | undefined) {
+    return this.http.get<Task>('https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks/' + id + '.json')
+    .pipe(map(data => {
+      let task = {id: id, ...data}
+      return task
+    }))
   }
 }
