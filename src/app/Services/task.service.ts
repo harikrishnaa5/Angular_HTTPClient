@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Task } from '../Model/Task';
 import { catchError, map, Subject, throwError } from 'rxjs';
@@ -12,9 +12,13 @@ export class TaskService {
   logService: LoggingService = inject(LoggingService);
   errorSubject = new Subject<HttpErrorResponse>();
   GetAllTasks() {
+    let header = new HttpHeaders()
+    header = header.set('content-type', 'application/json')
+    header = header.set('content-type', 'text/html')
     const response = this.http
       .get<{ [key: string]: Task }>(
-        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json'
+        'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json',
+        {headers: header}
       )
       .pipe(
         map((response) => {
