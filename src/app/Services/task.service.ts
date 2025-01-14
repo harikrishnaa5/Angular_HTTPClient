@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Task } from '../Model/Task';
 import { catchError, map, Subject, throwError } from 'rxjs';
@@ -12,13 +12,18 @@ export class TaskService {
   logService: LoggingService = inject(LoggingService);
   errorSubject = new Subject<HttpErrorResponse>();
   GetAllTasks() {
-    let header = new HttpHeaders()
-    header = header.set('content-type', 'application/json')
-    header = header.set('content-type', 'text/html')
+    let header = new HttpHeaders() // this is immutable
+    header = header.set('content-type', 'application/json') // as it is immutable we re-assign the header with its new instance created using .set()
+  
+
+
+    let queryParams = new HttpParams()
+    queryParams = queryParams.set('orderBy', '"$key"')
+    queryParams = queryParams.set('limitToFirst', '2')
     const response = this.http
       .get<{ [key: string]: Task }>(
         'https://angularhttpclient-b8ed3-default-rtdb.firebaseio.com/tasks.json',
-        {headers: header}
+        {headers: header, params: queryParams}
       )
       .pipe(
         map((response) => {
